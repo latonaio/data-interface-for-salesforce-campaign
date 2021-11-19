@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: data-interface-for-salesforce-campaign
+  name: data-interface-for-salesforce-campaign
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: data-interface-for-salesforce-campaign
+  strategy:
+    rollingUpdate:
+  template:
+    metadata:
+      labels:
+        run: data-interface-for-salesforce-campaign
+    spec:
+      hostname: data-interface-for-salesforce-campaign
+      containers:
+        - name: data-interface-for-salesforce-campaign
+          image: latonaio/data-interface-for-salesforce-campaign
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "9000"
+            - name: TZ
+              value: Asia/Tokyo
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: "200Mi"
+            requests:
+              cpu: "0.5"
+              memory: "100Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: data-interface-for-salesforce-campaign
+  name: data-interface-for-salesforce-campaign
+spec:
+  selector:
+    run: data-interface-for-salesforce-campaign
+  type: ClusterIP
+  ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: 9000
